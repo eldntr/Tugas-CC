@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Weather Data</title>
+</head>
+<body>
+    <h1>Weather Data</h1>
+    <table border="1">
+        <tr>
+            <th>Timestamp</th>
+            <th>Temperature</th>
+            <th>Humidity</th>
+            <th>Description</th>
+        </tr>
+        {% for row in weather_data %}
+        <tr>
+            <td>{{ row[0] }}</td>
+            <td>{{ row[1] }}</td>
+            <td>{{ row[2] }}</td>
+            <td>{{ row[3] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
