@@ -5,10 +5,13 @@ services:
     image: node:14
     working_dir: /app
     volumes:
-      - ./websocket:/app
+      - ./backend:/app
     command: sh -c "npm install && npm start"
     ports:
-      - "8080:8080"
+      - "3002:3002"
+    depends_on:
+      - mongo-backend
+      - auth
 
   backend:
     image: node:14
@@ -17,7 +20,11 @@ services:
       - ./backend:/app
     command: sh -c "npm install && npm start"
     ports:
-      - "3000:3000"
+      - "3001:3001"
+    depends_on:
+      - mongo-backend
+    environment:
+      - NODE_ENV=development
 
   auth:
     image: node:14
@@ -27,6 +34,8 @@ services:
     command: sh -c "npm install && npm start"
     ports:
       - "4000:4000"
+    depends_on:
+      - mongo-auth
 
   frontend:
     image: node:14
@@ -36,13 +45,32 @@ services:
     command: sh -c "npm install && npm start"
     ports:
       - "8081:8081"
+    depends_on:
+      - backend
+      - auth
 
   database:
     image: mongo
     ports:
-      - "27017:27017"
+      - "27019:27017"
     volumes:
       - mongo-data:/data/db
 
+  mongo-backend:
+    image: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data-backend:/data/db
+
+  mongo-auth:
+    image: mongo
+    ports:
+      - "27018:27017"
+    volumes:
+      - mongo-data-auth:/data/db
+
 volumes:
+  mongo-data-backend:
+  mongo-data-auth:
   mongo-data:
