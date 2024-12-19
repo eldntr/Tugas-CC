@@ -6,7 +6,11 @@ const cors = require('cors');
 
 const app = express();
 app.use(bodyParser.json());
-app.use(cors());
+app.use(cors({
+    origin: 'http://localhost:8081', 
+    methods: ['GET', 'POST'],
+    credentials: true
+}));
 
 mongoose.connect('mongodb://mongo-auth:27017/auth', {
   useNewUrlParser: true,

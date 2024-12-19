@@ -2,22 +2,18 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 const http = require('http');
-const { Server } = require('socket.io');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server, {
-  cors: {
-    origin: '*',
-    methods: ['GET', 'POST'],
-    credentials: true
-  }
-});
 
 app.use(bodyParser.json());
-app.use(cors());
+app.use(cors({
+    origin: 'http://localhost:8081', 
+    methods: ['GET', 'POST'],
+    credentials: true
+}));
 
 mongoose.connect('mongodb://mongo-backend:27017/chat', { useNewUrlParser: true, useUnifiedTopology: true });
 
@@ -56,47 +52,13 @@ app.get('/messages/:otherUser', async (req, res) => {
 });
 
 app.post('/messages', async (req, res) => {
-  const message = new Message(req.body);
-  await message.save();
-  res.status(201).json(message);
-});
-
-io.use((socket, next) => {
-  const token = socket.handshake.auth.token;
-  jwt.verify(token, 'secretkey', (err, decoded) => {
-    if (err) return next(new Error('Authentication error'));
-    socket.username = decoded.username;
-    next();
-  });
-});
-
-io.on('connection', (socket) => {
-    socket.join(socket.username);
-
-    socket.on('private message', async (data) => {
-        try {
-            const { to, message } = data;
-            const chatMessage = new Message({
-                from: socket.username,
-                to,
-                message,
-                timestamp: new Date(),
-            });
-            await chatMessage.save();
-
-            io.to(to).emit('private message', {
-                from: socket.username,
-                message,
-            });
-
-            socket.emit('message sent', {
-                to,
-                message,
-            });
-        } catch (error) {
-            socket.emit('error', { message: 'Failed to send message' });
-        }
-    });
+  try {
+    const message = new Message(req.body);
+    await message.save();
+    res.status(201).json(message);
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to save message' });
+  }
 });
 
 server.listen(3001, () => {

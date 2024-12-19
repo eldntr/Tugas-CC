@@ -1,4 +1,3 @@
-
 const chat = document.getElementById('chat');
 const messageForm = document.getElementById('messageForm');
 const messageInput = document.getElementById('messageInput');
@@ -49,7 +48,7 @@ function login(event) {
     .then(data => {
         if (data.token) {
             token = data.token;
-            currentUser = username; // Store current user
+            currentUser = username; 
             document.getElementById('auth-forms').style.display = 'none';
             document.getElementById('chat-interface').style.display = 'block';
             fetchUsers();
@@ -78,7 +77,7 @@ function fetchUsers() {
     })
     .then(users => {
         const userList = document.getElementById('userList');
-        userList.innerHTML = ''; // Clear existing list
+        userList.innerHTML = ''; 
         users.forEach(user => {
             userList.innerHTML += createUserListItem(user.username);
         });
@@ -107,7 +106,6 @@ function selectUser(username) {
     currentChatUser = username;
     console.log('Selected user:', username);
     
-    // Update chat header
     document.getElementById('chatHeader').innerHTML = `
         <div class="d-flex align-items-center">
             <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-2" 
@@ -118,7 +116,6 @@ function selectUser(username) {
         </div>
     `;
     
-    // Clear messages and load chat history
     const messagesDiv = document.getElementById('messages');
     messagesDiv.innerHTML = '';
     loadMessages(username);
@@ -171,14 +168,13 @@ function sendMessage() {
             message: message
         });
 
-        // Optimistically add message to UI
         appendMessage(true, message);
         messageInput.value = '';
     }
 }
 
 function connectSocket() {
-    socket = io('http://localhost:3001', {
+    socket = io('http://localhost:3002', { 
         auth: { token }
     });
 
@@ -186,14 +182,11 @@ function connectSocket() {
         console.log('Socket connected');
     });
 
-    // Listen for 'private message' events
     socket.on('private message', data => {
         console.log('Received private message:', data);
         if (data.from === currentChatUser) {
             appendMessage(false, data.message);
-        } else {
-            // Optional: display notification or update chat list
-        }
+        } 
     });
 
     socket.on('message sent', data => {
@@ -206,7 +199,6 @@ function connectSocket() {
     });
 }
 
-// Event Listeners
 document.getElementById('register-form').addEventListener('submit', register);
 document.getElementById('login-form').addEventListener('submit', login);
 document.getElementById('messageForm').addEventListener('submit', function(e) {
@@ -214,7 +206,6 @@ document.getElementById('messageForm').addEventListener('submit', function(e) {
     sendMessage();
 });
 
-// Initialize Bootstrap tabs
 var triggerTabList = [].slice.call(document.querySelectorAll('#authTabs a'))
 triggerTabList.forEach(function (triggerEl) {
     new bootstrap.Tab(triggerEl)
