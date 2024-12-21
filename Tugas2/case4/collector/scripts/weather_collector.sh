@@ -1,5 +1,3 @@
-#!/bin/sh
-
 docker rm -f weather_collector
 
 docker container run -d \

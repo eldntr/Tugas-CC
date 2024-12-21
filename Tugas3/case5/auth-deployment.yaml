@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yml
+    kompose.version: 1.26.1 (a9d05d509)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: auth
+  name: auth
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: auth
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f docker-compose.yml
+        kompose.version: 1.26.1 (a9d05d509)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/chat-network: "true"
+        io.kompose.service: auth
+    spec:
+      containers:
+        - args:
+            - sh
+            - -c
+            - npm install && npm start
+          image: node:14
+          name: auth
+          ports:
+            - containerPort: 4000
+          resources: {}
+          volumeMounts:
+            - mountPath: /app
+              name: auth-claim0
+          workingDir: /app
+      restartPolicy: Always
+      volumes:
+        - name: auth-claim0
+          persistentVolumeClaim:
+            claimName: auth-claim0
+status: {}
